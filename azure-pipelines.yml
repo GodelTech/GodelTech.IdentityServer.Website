@@ -1,93 +1,100 @@
 # Build for .NET Core project
 
 trigger:
-    batch: true
-    branches:
-        include:
-            - '*'
+  batch: true
+  branches:
+      include:
+          - '*'
 
 pr:
-    branches:
-        include:
-            - '*'
+  branches:
+      include:
+          - '*'
 
 pool:
-    vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-latest'
 
 variables:
-    buildConfiguration: 'Release'
+  buildConfiguration: Release
+  sonarCloudOrganizationName: godeltech
 
-steps:
-    - task: SonarCloudPrepare@1
-      displayName: 'Prepare analysis on SonarCloud'
-      inputs:
+stages:
+- stage: Build
+  displayName: 'Build'
+  jobs:
+    - job: Build
+      displayName: 'Build'
+      steps:
+      - task: SonarCloudPrepare@1
+        displayName: 'Prepare analysis on SonarCloud'
+        inputs:
           SonarCloud: 'SonarCloud'
-          organization: 'godeltech'
+          organization: '$(sonarCloudOrganizationName)'
           scannerMode: 'MSBuild'
           projectKey: '$(Build.DefinitionName)'
           projectName: '$(Build.DefinitionName)'
           extraProperties: 'sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/**/coverage.opencover.xml'
 
-    - task: UseDotNet@2
-      displayName: 'Use .NET Core SDK'
-      inputs:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core SDK'
+        inputs:
           packageType: 'sdk'
           version: '3.x'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet restore'
-      inputs:
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet restore'
+        inputs:
           command: 'restore'
           projects: '**/*.csproj'
           feedsToUse: 'select'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet build'
-      inputs:
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet build'
+        inputs:
           command: 'build'
           projects: '**/*.csproj'
           arguments: '--configuration $(buildConfiguration)'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet test'
-      inputs:
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet test'
+        inputs:
           command: 'test'
           projects: '**/*[Tt]ests/*.csproj'
           arguments: '--configuration $(buildConfiguration) --settings $(System.DefaultWorkingDirectory)/CodeCoverage.runsettings --collect:"XPlat Code Coverage" -- RunConfiguration.DisableAppDomain=true'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Install ReportGenerator tool'
-      inputs:
+      - task: DotNetCoreCLI@2
+        displayName: 'Install ReportGenerator tool'
+        inputs:
           command: 'custom'
           custom: 'tool'
           arguments: 'install --tool-path . dotnet-reportgenerator-globaltool'
 
-    - script: ./reportgenerator -reports:$(Agent.TempDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/coverlet/reports -reporttypes:"Cobertura"
-      displayName: 'Create reports'
+      - script: ./reportgenerator -reports:$(Agent.TempDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/coverlet/reports -reporttypes:"Cobertura"
+        displayName: 'Create reports'
 
-    - task: PublishCodeCoverageResults@1
-      displayName: 'Publish code coverage'
-      inputs:
+      - task: PublishCodeCoverageResults@1
+        displayName: 'Publish code coverage'
+        inputs:
           codeCoverageTool: 'Cobertura'
           summaryFileLocation: '$(Build.SourcesDirectory)/coverlet/reports/Cobertura.xml'
 
-    # Temp solution because of issue with SonarCloud
-    - task: UseDotNet@2
-      displayName: 'Use .NET Core SDK 2.2.x for SonarCloud'
-      inputs:
+      # Temp solution because of issue with SonarCloud
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core SDK 2.2.x for SonarCloud'
+        inputs:
           packageType: 'sdk'
           version: '2.2.x'
 
-    - task: SonarCloudAnalyze@1
-      displayName: 'Run Code Analysis'
+      - task: SonarCloudAnalyze@1
+        displayName: 'Run Code Analysis'
 
-    - task: SonarCloudPublish@1
-      displayName: 'Publish Quality Gate Result'
-      inputs:
+      - task: SonarCloudPublish@1
+        displayName: 'Publish Quality Gate Result'
+        inputs:
           pollingTimeoutSec: '300'
 
-    - task: sonarcloud-buildbreaker@2
-      displayName: 'Break build on quality gate failure'
-      inputs:
+      - task: sonarcloud-buildbreaker@2
+        displayName: 'Break build on quality gate failure'
+        inputs:
           SonarCloud: 'SonarCloud'
-          organization: 'godeltech'
+          organization: '$(sonarCloudOrganizationName)'

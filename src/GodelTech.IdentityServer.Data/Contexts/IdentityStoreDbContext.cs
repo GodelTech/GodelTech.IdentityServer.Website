@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using GodelTech.IdentityServer.Data.Configuration;
+using GodelTech.IdentityServer.Data.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace GodelTech.IdentityServer.Data.Contexts
 {
-    public class IdentityStoreDbContext : IdentityDbContext<IdentityUser>
+    public class IdentityStoreDbContext : IdentityDbContext<User>
     {
         public const string DefaultSchema = "identity";
         
@@ -14,6 +15,9 @@ namespace GodelTech.IdentityServer.Data.Contexts
         {
             base.OnModelCreating(builder);
             builder.HasDefaultSchema(DefaultSchema);
+
+            builder.ApplyConfiguration(new UserConfiguration());
+            builder.ApplyConfiguration(new UserSettingConfiguration());
         }
     }
 }

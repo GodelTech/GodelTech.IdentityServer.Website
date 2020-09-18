@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Json;
 using GodelTech.IdentityServer.Data.Contexts;
+using GodelTech.IdentityServer.Data.Models;
 using IdentityModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +24,7 @@ namespace GodelTech.IdentityServer.Data.Migration.Seeds
                 services.AddAuthentication();
                 services.AddAuthorization();
 
-                var builder = services.AddIdentityCore<IdentityUser>(o =>
+                var builder = services.AddIdentityCore<User>(o =>
                 {
                     // configure identity options
                     o.Password.RequireDigit = false;
@@ -46,11 +47,11 @@ namespace GodelTech.IdentityServer.Data.Migration.Seeds
                 using var serviceProvider = services.BuildServiceProvider();
                 using var scope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope();
                 
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 var alice = userManager.FindByNameAsync("alice").GetAwaiter().GetResult();
                 if (alice == null)
                 {
-                    alice = new IdentityUser {UserName = "alice"};
+                    alice = new User {UserName = "alice"};
                     var result = userManager.CreateAsync(alice, "Pass123$").GetAwaiter().GetResult();
                     if (!result.Succeeded)
                     {
@@ -84,7 +85,7 @@ namespace GodelTech.IdentityServer.Data.Migration.Seeds
                 var bob = userManager.FindByNameAsync("bob").GetAwaiter().GetResult();
                 if (bob == null)
                 {
-                    bob = new IdentityUser {UserName = "bob"};
+                    bob = new User {UserName = "bob"};
                     var result = userManager.CreateAsync(bob, "Pass123$").GetAwaiter().GetResult();
                     if (!result.Succeeded)
                     {

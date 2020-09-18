@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using GodelTech.IdentityServer.Data.Models;
 using GodelTech.IdentityServer.Web.Configuration;
 using IdentityModel;
 using IdentityServer4;
@@ -21,8 +22,8 @@ namespace GodelTech.IdentityServer.Web.Controllers
     [AllowAnonymous]
     public class ExternalController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly IIdentityServerInteractionService _interaction;
         private readonly ILogger<ExternalController> _logger;
         private readonly IEventService _events;
@@ -31,8 +32,8 @@ namespace GodelTech.IdentityServer.Web.Controllers
             IIdentityServerInteractionService interaction,
             IEventService events,
             ILogger<ExternalController> logger,
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            UserManager<User> userManager,
+            SignInManager<User> signInManager)
         {
             _interaction = interaction;
             _logger = logger;
@@ -146,7 +147,7 @@ namespace GodelTech.IdentityServer.Web.Controllers
             return Redirect(returnUrl);
         }
 
-        private async Task<(IdentityUser user, string provider, string providerUserId, IEnumerable<Claim> claims)>
+        private async Task<(User user, string provider, string providerUserId, IEnumerable<Claim> claims)>
             FindUserFromExternalProviderAsync(AuthenticateResult result)
         {
             var externalUser = result.Principal;
@@ -171,7 +172,7 @@ namespace GodelTech.IdentityServer.Web.Controllers
             return (user, provider, providerUserId, claims);
         }
 
-        private async Task<IdentityUser> AutoProvisionUserAsync(string provider, string providerUserId, IEnumerable<Claim> claims)
+        private async Task<User> AutoProvisionUserAsync(string provider, string providerUserId, IEnumerable<Claim> claims)
         {
             // create a list of claims that we want to transfer into our store
             var filtered = new List<Claim>();
@@ -212,7 +213,7 @@ namespace GodelTech.IdentityServer.Web.Controllers
                 filtered.Add(new Claim(JwtClaimTypes.Email, email));
             }
 
-            var user = new IdentityUser()
+            var user = new User()
             {
                 UserName = Guid.NewGuid().ToString(),
             };

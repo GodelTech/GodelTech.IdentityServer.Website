@@ -1,4 +1,5 @@
 ﻿using GodelTech.IdentityServer.Data.Contexts;
+using GodelTech.IdentityServer.Data.Models;
 using IdentityServer4;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ namespace GodelTech.IdentityServer.Web.Configuration
             services.AddDbContext<IdentityStoreDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString(nameof(IdentityStoreDbContext))));
             
-            services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            services.AddIdentity<User, IdentityRole>(options =>
             {
                  // configure identity options
                  options.Password.RequireDigit = true;
@@ -49,7 +50,7 @@ namespace GodelTech.IdentityServer.Web.Configuration
                     .UseSqlServer(configuration.GetConnectionString(nameof(ConfigurationStoreDbContext)));
                 options.DefaultSchema = ConfigurationStoreDbContext.DefaultSchema;
             })
-            .AddAspNetIdentity<IdentityUser>()
+            .AddAspNetIdentity<User>()
             // not recommended for production - you need to store your key material somewhere secure
             .AddDeveloperSigningCredential();
 

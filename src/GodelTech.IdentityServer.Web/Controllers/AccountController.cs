@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GodelTech.IdentityServer.Data.Models;
 using GodelTech.IdentityServer.Web.Configuration;
 using GodelTech.IdentityServer.Web.Configuration.Account;
 using GodelTech.IdentityServer.Web.Models.Account;
@@ -22,20 +23,20 @@ namespace GodelTech.IdentityServer.Web.Controllers
     [AllowAnonymous]
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
 
         public AccountController(
-            UserManager<IdentityUser> userManager,
+            UserManager<User> userManager,
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
             IAuthenticationSchemeProvider schemeProvider,
             IEventService events,
-            SignInManager<IdentityUser> signInManager)
+            SignInManager<User> signInManager)
         {
             _interaction = interaction;
             _clientStore = clientStore;
@@ -89,9 +90,10 @@ namespace GodelTech.IdentityServer.Web.Controllers
                     
                     if (context != null)
                     {
-                        return context.IsNativeClient() ? this.LoadingPage("Redirect", model.ReturnUrl) : Redirect(model.ReturnUrl);
-
                         // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
+                        return context.IsNativeClient() 
+                            ? this.LoadingPage("Redirect", model.ReturnUrl)
+                            : Redirect(model.ReturnUrl);
                     }
 
                     // request for a local page
@@ -144,7 +146,7 @@ namespace GodelTech.IdentityServer.Web.Controllers
             if (User?.Identity.IsAuthenticated == true)
             {
                 // delete local authentication cookie
-                await HttpContext.SignOutAsync();
+                await _signInManager.SignOutAsync();
 
                 // raise the logout event
                 await _events.RaiseAsync(new UserLogoutSuccessEvent(User.GetSubjectId(), User.GetDisplayName()));
@@ -170,7 +172,6 @@ namespace GodelTech.IdentityServer.Web.Controllers
         {
             return View();
         }
-
 
         /*****************************************/
         /* helper APIs for the AccountController */
@@ -279,7 +280,7 @@ namespace GodelTech.IdentityServer.Web.Controllers
             // get context information (client name, post logout redirect URI and iframe for federated signout)
             var logout = await _interaction.GetLogoutContextAsync(logoutId);
 
-            var vm = new LoggedOutViewModel
+            var loggedOutViewModel = new LoggedOutViewModel
             {
                 AutomaticRedirectAfterSignOut = AccountOptions.AutomaticRedirectAfterSignOut,
                 PostLogoutRedirectUri = logout?.PostLogoutRedirectUri,
@@ -296,20 +297,20 @@ namespace GodelTech.IdentityServer.Web.Controllers
                     var providerSupportsSignout = await HttpContext.GetSchemeSupportsSignOutAsync(idp);
                     if (providerSupportsSignout)
                     {
-                        if (vm.LogoutId == null)
+                        if (loggedOutViewModel.LogoutId == null)
                         {
                             // if there's no current logout context, we need to create one
                             // this captures necessary info from the current logged in user
                             // before we signout and redirect away to the external IdP for signout
-                            vm.LogoutId = await _interaction.CreateLogoutContextAsync();
+                            loggedOutViewModel.LogoutId = await _interaction.CreateLogoutContextAsync();
                         }
 
-                        vm.ExternalAuthenticationScheme = idp;
+                        loggedOutViewModel.ExternalAuthenticationScheme = idp;
                     }
                 }
             }
 
-            return vm;
+            return loggedOutViewModel;
         }
     }
 }

@@ -1,0 +1,16 @@
+@import "src/styles";
+
+.footer {
+    &__nav {
+        @extend .d-flex,
+            .justify-content-center,
+            .align-items-center,
+            .navbar,
+            .navbar-expand-sm,
+            .navbar,
+            .navbar-dark,
+            .bg-dark,
+            .shadow,
+            .p-1;
+    }
+}

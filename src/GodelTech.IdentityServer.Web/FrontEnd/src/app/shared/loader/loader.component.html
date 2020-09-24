@@ -1,0 +1,11 @@
+<div class="loader" *ngIf="isLoading">
+    <div
+        class="spinner-grow"
+        role="status"
+        [ngStyle]="{
+            width: size * 32
+        }"
+    >
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>

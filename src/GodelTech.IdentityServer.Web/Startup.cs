@@ -85,7 +85,6 @@ namespace GodelTech.IdentityServer.Web
             
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapDefaultControllerRoute();
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");

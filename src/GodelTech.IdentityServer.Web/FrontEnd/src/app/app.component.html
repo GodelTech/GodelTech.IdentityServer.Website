@@ -1,6 +1,11 @@
-<body>
-    <app-nav-menu></app-nav-menu>
-    <div class="container">
+<div class="app">
+    <!-- top navbar-->
+    <app-header class="app__header"></app-header>
+    <!-- Main section-->
+    <section class="app__body">
+        <!-- Page content-->
         <router-outlet></router-outlet>
-    </div>
-</body>
+    </section>
+    <!-- Page footer-->
+    <app-footer class="app__footer"></app-footer>
+</div>

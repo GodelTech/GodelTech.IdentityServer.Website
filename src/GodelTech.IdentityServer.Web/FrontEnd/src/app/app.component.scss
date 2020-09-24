@@ -1,0 +1,17 @@
+@import "src/styles";
+
+.app {
+    @extend .d-flex, .flex-column, .w-100, .h-100;
+
+    &__header {
+        @extend .flex-shrink-1;
+    }
+
+    &__body {
+        @extend .container, .h-100;
+    }
+
+    &__footer {
+        @extend .flex-shrink-1;
+    }
+}

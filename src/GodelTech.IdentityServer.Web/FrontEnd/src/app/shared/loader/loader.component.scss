@@ -1,0 +1,14 @@
+@import "src/styles";
+
+.loader {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    background-color: transparentize(map-get($colors, "white"), 0.3);
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+}

@@ -1,0 +1,5 @@
+@import "src/styles";
+
+.not-found {
+    @extend .d-flex, .justify-content-center, .flex-column, .h-100;
+}

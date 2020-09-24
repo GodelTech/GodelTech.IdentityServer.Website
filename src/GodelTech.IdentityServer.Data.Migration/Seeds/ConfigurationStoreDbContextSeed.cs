@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using GodelTech.IdentityServer.Data.Contexts;
+using IdentityModel;
 using IdentityServer4.EntityFramework.Mappers;
 using IdentityServer4.Models;
 using Serilog;
@@ -21,21 +22,34 @@ namespace GodelTech.IdentityServer.Data.Migration.Seeds
                 {
                     context.IdentityResources.AddRange(
                         new IdentityResources.OpenId().ToEntity(),
-                        new IdentityResources.Profile().ToEntity()
+                        new IdentityResources.Profile().ToEntity(),
+                        new IdentityResources.Email().ToEntity(),
+                        new IdentityResources.Phone().ToEntity(),
+                        new IdentityResources.Address().ToEntity()
                     );
                 }
 
                 if (!context.ApiScopes.Any())
                 {
                     context.ApiScopes.AddRange(
-                        new ApiScope("scope1").ToEntity(),
-                        new ApiScope("scope2").ToEntity()
+                        new ApiScope("sample-api-scope")
+                        {
+                            ShowInDiscoveryDocument = true,
+                            UserClaims = new[]
+                            {
+                                JwtClaimTypes.Name, JwtClaimTypes.EmailVerified, JwtClaimTypes.FamilyName,
+                                JwtClaimTypes.Email, JwtClaimTypes.GivenName
+                            }
+                        }.ToEntity()
                     );
                 }
 
                 if (!context.ApiResources.Any())
                 {
-                    context.ApiResources.Add(new ApiResource("api1", "My API #1").ToEntity());
+                    context.ApiResources.Add(new ApiResource("sample-api", "My API #1")
+                    {
+                        Scopes = new[] {"sample-api-scope"}
+                    }.ToEntity());
                 }
 
                 if (!context.Clients.Any())
@@ -74,20 +88,30 @@ namespace GodelTech.IdentityServer.Data.Migration.Seeds
                         {
                             ClientId = "spa",
                             ClientName = "SPA Client",
-                            ClientUri = "http://identityserver.io",
+                            ClientUri = "https://localhost:5001",
                             AllowedGrantTypes = GrantTypes.Code,
                             RequirePkce = true,
                             RequireClientSecret = false,
                             RedirectUris =
                             {
-                                "http://localhost:5002/index.html",
-                                "http://localhost:5002/callback.html",
-                                "http://localhost:5002/silent.html",
-                                "http://localhost:5002/popup.html",
+                                "https://localhost:5001/index.html",
+                                "https://localhost:5001/callback.html",
+                                "https://localhost:5001/silent.html",
+                                "https://localhost:5001/popup.html",
+                                "https://localhost:5001/login-callback",
+                                "https://localhost:5001/login-callback.html",
+                                "https://localhost:5001/silent-refresh.html"
                             },
-                            PostLogoutRedirectUris = {"http://localhost:5002/index.html"},
-                            AllowedCorsOrigins = {"http://localhost:5002"},
-                            AllowedScopes = {"openid", "profile", "api1"}
+                            PostLogoutRedirectUris = {"https://localhost:5001/index.html"},
+                            AllowedCorsOrigins = {"https://localhost:5001"},
+                            AllowedScopes =
+                            {
+                                "openid",
+                                "profile",
+                                "email",
+                                "address",
+                                "phone"
+                            }
                         }.ToEntity(),
                         new Client
                         {

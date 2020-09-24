@@ -1,0 +1,173 @@
+<div class="container py-3 w-75 h-100 d-flex justify-content-center align-items-center">
+    <form
+        class="w-100 border shadow position-relative"
+        role="form"
+        (ngSubmit)="onSubmit()"
+        [formGroup]="registerForm"
+        novalidate
+    >
+        <app-loader [isLoading]="pending"></app-loader>
+        <h4
+            class="text-secondary d-flex flex-row align-items-center justify-content-center w-100 p-3 mb-3 bg-dark text-light rounded-top"
+        >
+            <span class="material-icons mx-3">account_circle</span>Register Your Account
+        </h4>
+        <div class="form-group row px-3">
+            <label for="name" class="col-sm-3 col-form-label">E-Mail</label>
+            <div class="col-sm-9">
+                <input
+                    type="text"
+                    id="name"
+                    name="email"
+                    formControlName="email"
+                    [placeholder]="'Please, enter your e-mail here'"
+                    class="form-control"
+                    [ngClass]="{
+                        'is-invalid':
+                            registerForm.controls['email'].invalid && !registerForm.controls['email'].untouched
+                    }"
+                />
+                <div
+                    class="invalid-feedback"
+                    *ngIf="registerForm.controls['email'].invalid && !registerForm.controls['email'].untouched"
+                >
+                    <span translate>Email is required</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row px-3">
+            <label for="password" class="col-sm-3 col-form-label">Password</label>
+            <div class="col-sm-9">
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    formControlName="password"
+                    [placeholder]="'Please, enter your password here'"
+                    class="form-control"
+                    [ngClass]="{
+                        'is-invalid':
+                            registerForm.controls['password'].invalid && !registerForm.controls['password'].untouched
+                    }"
+                />
+                <div
+                    class="invalid-feedback"
+                    *ngIf="registerForm.controls['password'].invalid && !registerForm.controls['password'].untouched"
+                >
+                    <span translate>Password is required</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row px-3">
+            <label for="confirmPassword" class="col-sm-3 col-form-label">Confirm Password</label>
+            <div class="col-sm-9">
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    formControlName="confirmPassword"
+                    [placeholder]="'Please, confirm your password here'"
+                    class="form-control"
+                    [ngClass]="{
+                        'is-invalid':
+                            registerForm.controls['confirmPassword'].invalid &&
+                            !registerForm.controls['confirmPassword'].untouched
+                    }"
+                />
+                <div
+                    class="invalid-feedback"
+                    *ngIf="
+                        registerForm.controls['confirmPassword'].invalid &&
+                        !registerForm.controls['confirmPassword'].untouched
+                    "
+                >
+                    <span translate>Confirm Password is required</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row px-3">
+            <label for="firstName" class="col-sm-3 col-form-label">First Name</label>
+            <div class="col-sm-9">
+                <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    formControlName="firstName"
+                    [placeholder]="'Please, enter your first name here'"
+                    class="form-control"
+                    [ngClass]="{
+                        'is-invalid':
+                            registerForm.controls['firstName'].invalid && !registerForm.controls['firstName'].untouched
+                    }"
+                />
+                <div
+                    class="invalid-feedback"
+                    *ngIf="registerForm.controls['firstName'].invalid && !registerForm.controls['firstName'].untouched"
+                >
+                    <span translate>First name is required</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row px-3">
+            <label for="lastName" class="col-sm-3 col-form-label">Last Name</label>
+            <div class="col-sm-9">
+                <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    formControlName="lastName"
+                    [placeholder]="'Please, enter your last name here'"
+                    class="form-control"
+                    [ngClass]="{
+                        'is-invalid':
+                            registerForm.controls['lastName'].invalid && !registerForm.controls['lastName'].untouched
+                    }"
+                />
+                <div
+                    class="invalid-feedback"
+                    *ngIf="registerForm.controls['lastName'].invalid && !registerForm.controls['lastName'].untouched"
+                >
+                    <span translate>Last name is required</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row px-3">
+            <label for="location" class="col-sm-3 col-form-label">Location</label>
+            <div class="col-sm-9">
+                <input
+                    type="text"
+                    id="location"
+                    name="location"
+                    formControlName="location"
+                    [placeholder]="'Please, enter your location here'"
+                    class="form-control"
+                    [ngClass]="{
+                        'is-invalid':
+                            registerForm.controls['location'].invalid && !registerForm.controls['location'].untouched
+                    }"
+                />
+                <div
+                    class="invalid-feedback"
+                    *ngIf="registerForm.controls['location'].invalid && !registerForm.controls['location'].untouched"
+                >
+                    <span translate>Location is required</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row px-3 m-0">
+            <div
+                class="alert alert-danger"
+                [hidden]="pending || !errorMessage || (!registerForm.pristine && registerForm.invalid)"
+                translate
+            >
+                <b>{{
+                    (errorMessage || (!registerForm.pristine && registerForm.invalid) || "") &&
+                        "Register form has invalid data."
+                }}</b>
+            </div>
+        </div>
+        <div class="d-flex flex-row justify-content-start border-top p-3">
+            <button class="btn btn-dark" type="submit" [disabled]="registerForm.invalid || pending">Register</button>
+        </div>
+    </form>
+</div>

@@ -1,3 +1,22 @@
+export class UserProfile {
+    public id: string;
+    public email: string;
+    public name: string;
+    public userName: string;
+}
+
+// tslint:disable-next-line:max-classes-per-file
+export class ListOf<T> {
+    public total: number;
+    public collection: T[];
+}
+
+// tslint:disable-next-line:max-classes-per-file
+export class ListOfUsers {
+    public total: number;
+    public collection: UserProfile[];
+}
+
 export interface IAuthenticateSuccessResponse {
     id: string;
     auth_token: string;
